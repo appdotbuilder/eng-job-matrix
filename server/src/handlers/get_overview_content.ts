@@ -1,16 +1,33 @@
-import { type OverviewContent } from '../schema';
+import { db } from '../db';
+import { overviewContentTable } from '../db/schema';
+import { eq, asc } from 'drizzle-orm';
 
 export async function getOverviewContent(): Promise<{
   goals: string[];
   principles: string[];
 }> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching overview content (goals and principles)
-  // from the database and organizing them into separate arrays for display.
-  // Content should be ordered by the 'order' field for consistent presentation.
-  
-  return {
-    goals: [],
-    principles: []
-  };
+  try {
+    // Fetch all overview content ordered by the 'order' field
+    const overviewData = await db.select()
+      .from(overviewContentTable)
+      .orderBy(asc(overviewContentTable.order))
+      .execute();
+
+    // Separate goals and principles into their respective arrays
+    const goals = overviewData
+      .filter(item => item.type === 'goal')
+      .map(item => item.content);
+
+    const principles = overviewData
+      .filter(item => item.type === 'principle')
+      .map(item => item.content);
+
+    return {
+      goals,
+      principles
+    };
+  } catch (error) {
+    console.error('Failed to fetch overview content:', error);
+    throw error;
+  }
 }

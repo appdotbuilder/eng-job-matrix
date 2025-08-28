@@ -1,14 +1,22 @@
+import { db } from '../db';
+import { criteriaTable } from '../db/schema';
 import { type CreateCriterionInput, type Criterion } from '../schema';
 
-export async function createCriterion(input: CreateCriterionInput): Promise<Criterion> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is creating a new criterion and persisting it in the database.
-  // This would be used for administrative functions or data seeding.
-  
-  return {
-    id: input.id,
-    category: input.category,
-    sub_category: input.sub_category,
-    created_at: new Date()
-  };
-}
+export const createCriterion = async (input: CreateCriterionInput): Promise<Criterion> => {
+  try {
+    // Insert criterion record
+    const result = await db.insert(criteriaTable)
+      .values({
+        id: input.id,
+        category: input.category,
+        sub_category: input.sub_category
+      })
+      .returning()
+      .execute();
+
+    return result[0];
+  } catch (error) {
+    console.error('Criterion creation failed:', error);
+    throw error;
+  }
+};

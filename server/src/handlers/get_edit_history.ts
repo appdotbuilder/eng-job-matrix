@@ -1,8 +1,19 @@
+import { db } from '../db';
+import { editHistoryTable } from '../db/schema';
 import { type EditHistoryEntry } from '../schema';
+import { desc } from 'drizzle-orm';
 
-export async function getEditHistory(): Promise<EditHistoryEntry[]> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching all edit history entries from the database
-  // ordered chronologically (newest first) to show document evolution and changes.
-  return [];
-}
+export const getEditHistory = async (): Promise<EditHistoryEntry[]> => {
+  try {
+    // Fetch all edit history entries ordered by date descending (newest first)
+    const results = await db.select()
+      .from(editHistoryTable)
+      .orderBy(desc(editHistoryTable.date), desc(editHistoryTable.created_at))
+      .execute();
+
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch edit history:', error);
+    throw error;
+  }
+};

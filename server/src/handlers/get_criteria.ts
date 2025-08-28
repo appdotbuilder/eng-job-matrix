@@ -1,8 +1,21 @@
+import { db } from '../db';
+import { criteriaTable } from '../db/schema';
 import { type Criterion } from '../schema';
 
-export async function getCriteria(): Promise<Criterion[]> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching all criteria (categories and sub-categories)
-  // from the database. This will be used for filter controls and matrix organization.
-  return [];
-}
+export const getCriteria = async (): Promise<Criterion[]> => {
+  try {
+    // Fetch all criteria from the database
+    const results = await db.select()
+      .from(criteriaTable)
+      .execute();
+
+    // Return criteria with proper type conversion for dates
+    return results.map(criterion => ({
+      ...criterion,
+      created_at: criterion.created_at // timestamp is already a Date object
+    }));
+  } catch (error) {
+    console.error('Failed to fetch criteria:', error);
+    throw error;
+  }
+};

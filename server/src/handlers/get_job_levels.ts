@@ -1,8 +1,19 @@
+import { db } from '../db';
+import { jobLevelsTable } from '../db/schema';
 import { type JobLevel } from '../schema';
 
-export async function getJobLevels(): Promise<JobLevel[]> {
-  // This is a placeholder declaration! Real code should be implemented here.
-  // The goal of this handler is fetching all job levels from the database.
-  // This will be used for populating filter dropdowns and comparison views.
-  return [];
-}
+export const getJobLevels = async (): Promise<JobLevel[]> => {
+  try {
+    const results = await db.select()
+      .from(jobLevelsTable)
+      .orderBy(jobLevelsTable.created_at)
+      .execute();
+
+    // Return the results as-is since no numeric conversions are needed
+    // All fields are text or timestamp types
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch job levels:', error);
+    throw error;
+  }
+};
